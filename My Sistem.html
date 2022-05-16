@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+  <html lang="en">
+
+       <head>    
+       <meta charset="utf-8">  
+       <meta http-equiv="X-UA-Compatible" content="IE=edge">     <meta name="viewport" content="width=device-widthinitial-scale=1">   
+       <meta name="description" content="">  
+       <meta name="author" content="">  
+      
+       <title>Starter Template for Bootstrap</title>      
+        <!--<link href="bootstrap.css" rel="stylesheet">
+         <link href="bootstrap.min.css" rel="stylesheet">  -->
+        <link href="sistem.css" rel="stylesheet">
+          <style>
+      @font-face{
+ font-family:himi;
+ src:url('cocon-next-arabic.ttf');
+}
+  </style>
+<style>
+  *{
+  margin: 0;
+  padding: 0;
+}/*
+ @font-face{
+ font-family:'cmsm';
+ src:url('hanimation-regular.ttf');
+}*/
+body{
+  font-family:'himi';
+  font-weight: bold ;
+}
+.crud{
+  width: 90%;
+  margin: auto;
+}
+.crud input{
+  margin-top: 10px ;
+  font-size: 20px ;
+}
+.crud button{
+  border-radius: 10px ;
+  margin-top: 20px ;
+  font-size: 20px ;
+}
+.head{
+  text-align: center ;
+  text-transform: uppercase;
+  margin: 10px 0px ;
+}
+.head h2{
+  margin-top: 50px ;
+  margin-bottom: 10px ;
+  color: #00ccff;
+  font-weight: bold ;
+  font-size: 30px ;
+}
+input{
+  width: 100%;
+  height: 30px ;
+  outline: none ;
+  border: none ;
+  background:#e2e4e4;
+  margin: 20px 0px ;
+  border-radius: 4px;
+  padding: 4px ;
+  transition-duration: 1.0s ;
+  font-family: himi ;
+}
+input:hover{
+  width: 104%;
+}
+input:focus{
+  background:#c8c9c9;
+}
+.price input{
+  width: 15%;
+}
+#total{
+  background:#00ccff;
+  padding: 20px 10px ;
+  color: #ffffff ;
+  border-radius: 4px;
+  font-weight: bold ;
+  font-size: 20px ;
+}
+#total::before {
+  content:'المجموع:';
+}
+button{
+  width: 100%;
+  height: 30px;
+  margin-top:2px;
+  border: none;
+  cursor: pointer;
+  background: #00ccff;
+  color: #ffffff ;
+  border-radius:4px ;
+  text-decoration: 0.5s;
+  font-family:himi ;
+}
+button:hover {
+  background:#6cddf9;
+  letter-spacing: 3px;
+}
+.btnsearch {
+  display: flex ;
+  justify-content: space-between ;
+}
+.btnsearch button{
+  width: 45%;
+}
+table {
+  width: 100%;
+  text-align: center ;
+  margin: 10px 0px ;
+}
+table th{
+ text-transform:uppercase; 
+}
+th, td{
+  padding: 5px;
+ 
+}
+th{
+  background: #bfbfbf66;
+  padding: 10px 5px;
+  border-radius: 10px 10px 10px 0px ;
+  box-shadow: 5px 10px 10px #b6b6b6 ;
+  font-size: 20px ;
+}
+td{
+  border: solid thin #e3e4e5f2;
+}
+.no-border{
+  border: none ;
+}
+.number{
+  background:#e3e4e5f2 ;
+}
+</style>
+  </head>  
+       <body dir="rtl"> 
+   <div class="crud">
+     <div class="head">
+       <h2>برنامج إدارة المنتجات </h2>
+       <h3>Product Management Program</h3>
+     </div>
+       <div class="inputs">
+         <input type="text"placeholder="المنتج"id="title">
+         <div class="price">
+           <input onkeyup="getTotal()"type="number"id="price"placeholder="السعر">
+               <input onkeyup="getTotal()"type="number"id="taxes"placeholder="ضرائب">
+                   <input onkeyup="getTotal()"type="number"id="ads"placeholder="اعلانات">
+                       <input onkeyup="getTotal()"type="number"id="discount"placeholder="خصومات">
+                       <input type="date"id="date">
+                       <small id="total">0</small>
+         </div>
+           <input type="number"placeholder="العدد"id="count">
+              <input type="text"placeholder="النوع"id="categry">
+                   <button id="submit">إضافة </button>
+       </div>
+         <div class="outputs">
+           <div class="searchblock">
+             <input type="text"id="search"onkeyup="searchData(this.value )"placeholder="بحث">
+        
+           <div class="btnsearch">
+             <button id="searchTitle"onclick="getSearchMood(this.id) ">البحث بالاسم </button>
+                <button id="searchCategry"onclick="getSearchMood(this.id)">البحث بالنوع</button>
+           </div>
+         </div>
+         <div id="deleteAll">
+           
+         </div>
+         <table>
+           <tr>
+             <th>الرقم</th>
+               <th>المنتج</th>
+                 <th>السعر</th>
+                   <th>الضرائب </th>
+                    <th>الاعلانات</th> 
+                      <th>الخصومات</th>
+                        <th>المجموع</th>
+                        <th>التاريخ</th>
+                        <th>النوع</th>
+                          <th>تعديل</th>
+                            <th>حذف</th>
+           </tr>
+           <tbody id="tbody">
+             
+           </tbody>
+         </table>
+        </div>
+   </div>
+     
+       <script>
+         
+         
+         let title =document.getElementById('title');
+let price =document.getElementById('price');
+let taxes =document.getElementById('taxes');
+let ads =document.getElementById('ads');
+let discount =document.getElementById('discount');
+let total =document.getElementById('total');
+let date =document.getElementById('date');
+let count =document.getElementById('count');
+let categry =document.getElementById('categry');
+let submit =document.getElementById('submit');
+
+let mood='create';
+let tmp;
+//git total
+function getTotal(){
+  if(price.value!=''){
+    let result=(+price.value+ +taxes.value+ +ads.value)+ -discount.value;
+    total.innerHTML=result;
+    total.style.background ='#0f8225';
+  }
+  else{
+     total.innerHTML='';
+       total.style.background ='#00ccff';
+  }
+}
+//creat product
+let datapro;
+if(localStorage.product!=null){
+  datapro=JSON.parse(localStorage.product)
+}
+else{
+  datapro=[];
+}
+
+ submit.onclick=function(){
+  let newpro={
+   title:title.value,
+   price:price.value,
+   taxes:taxes.value, 
+   ads:ads.value, 
+   discount:discount.value, 
+   total:total.innerHTML, 
+   date:date.value,
+   count:count.value, 
+   categry:categry.value, 
+  }
+  if(title.value!=''&& price.value!=''){
+     if(mood ==='create'){
+      if(newpro.count > 0){
+    for(let i =0; i < newpro.count;i++){
+      datapro.push(newpro);} 
+    }else{
+        datapro.push(newpro);
+    }
+  } 
+  else{
+    datapro[  tmp ]= newpro;
+    mood='create';
+    submit.innerHTML='اضافة';
+    count.style.display ='block';
+  }
+  }
+ 
+
+  
+ 
+ 
+ //save locelatorage
+  localStorage.setItem('product',     JSON.stringify(datapro)  ) 
+   clearData()
+   showData()
+// console.log(datapro)
+}
+
+
+
+
+//clear inputs
+function clearData(){
+  title.value='';
+  price.value='';
+  taxes.value='';
+  ads.value='';
+  discount.value='';
+  total.innerHTML ='';
+  date.value='';
+  count.value='';
+  categry.value='';
+}
+//read
+
+function showData(){
+  getTotal()
+  let table ='';
+  for (let i = 0;i < datapro.length;i++) {
+    table+=
+    `<tr>
+               <td class="number">${i+1}</td>
+                <td>${datapro[i].title}</td>
+                 <td>${datapro[i].price} </td>
+                   <td>${datapro[i].taxes}</td>
+                     <td>${datapro[i].ads}</td>
+                       <td>${datapro[i].discount}</td>  
+                         <td>${datapro[i].total}</td>
+                         <td>${datapro[i].date}</td>
+                           <td>${datapro[i].categry}</td>
+                          <td class="no-border"><button onclick="updateData(${i})"id="update">تعديل</button></td>
+                               <td class ="no-border"><button id="delete"onclick="deleteData(${i})">حذف</button></td>
+             </tr>`
+    ;
+ // console.log(datapro)
+  }
+ document.getElementById('tbody').innerHTML=table;
+ let btnDelete =document.getElementById('deleteAll');
+ if(datapro.length >0){
+   btnDelete.innerHTML=`<button onclick="deleteAll()">حذف الكل(${datapro.length})</button>`
+ }else{
+   btnDelete.innerHTML='';
+ }
+}
+showData()
+
+
+//delete
+
+function deleteData(i){
+ datapro.splice(i,1);
+ localStorage.product=JSON.stringify(datapro);
+ showData()
+}
+function deleteAll(){
+  localStorage.clear()
+  datapro.splice(0)
+  showData()
+}
+
+
+
+//count
+
+
+
+//update 
+function updateData(i){
+ title.value = datapro[i].title;
+ price.value = datapro[i].price;
+ taxes.value = datapro[i].taxes;
+ ads.value = datapro[i].ads;
+ discount.value = datapro[i].discount;
+ getTotal()
+ date.value=datapro[i].date;
+ count.style.display ='none';
+ categry.value = datapro [i].categry;
+ submit.innerHTML='تعديل';
+ mood='update';
+ tmp = i ;
+ scroll({
+   top:0,
+   behavior:'smooth', 
+ })
+} 
+
+
+
+
+
+
+//search 
+let searchMood='title';
+function getSearchMood(id)
+{
+  if(id=='searchTitle'){
+    searchMood='title';
+    search.placeholder ='البحث بالاسم ';
+  }
+  else{
+    searchMood='categry';
+      search.placeholder ='البحث بالنوع ';
+  }
+  search.focus()
+  search.value='';
+  showData()
+}
+function searchData(value){
+  let table='';
+  if(searchMood=='title'){
+    for(let i=0;i < datapro.length;i++){
+      if(datapro[i].title.includes(value)){
+        
+            table+=
+    `<tr>
+               <td class="number">${i+1}</td>
+                <td>${datapro[i].title}</td>
+                 <td>${datapro[i].price} </td>
+                   <td>${datapro[i].taxes}</td>
+                     <td>${datapro[i].ads}</td>
+                       <td>${datapro[i].discount}</td>  
+                         <td>${datapro[i].total}</td>
+                         <td>${datapro[i].date}</td>
+                           <td>${datapro[i].categry}</td>
+                          <td class="no-border"><button onclick="updateData(${i})"id="update">تعديل</button></td>
+                               <td class ="no-border"><button id="delete"onclick="deleteData(${i})">حذف</button></td>
+             </tr>`
+    ;
+        
+        
+      }
+    }
+  }
+  else{
+      for(let i=0;i < datapro.length;i++){
+      if(datapro[i].categry.includes(value)){
+        
+            table+=
+    `<tr>
+               <td class="number">${i+1}</td>
+                <td>${datapro[i].title}</td>
+                 <td>${datapro[i].price} </td>
+                   <td>${datapro[i].taxes}</td>
+                     <td>${datapro[i].ads}</td>
+                       <td>${datapro[i].discount}</td>  
+                         <td>${datapro[i].total}</td>
+                         <td>${datapro[i].date}</td>
+                           <td>${datapro[i].categry}</td>
+                          <td class="no-border"><button onclick="updateData(${i})"id="update">تعديل </button></td>
+                               <td class ="no-border"><button id="delete"onclick="deleteData(${i})">حذف</button></td>
+             </tr>`
+    ;
+        
+        
+      }
+    }
+  }
+   document.getElementById('tbody').innerHTML=table;
+}
+
+//clean data
+
+
+
+       </script>
+       <!--
+       <script src="jquery-3.6.0.min.js">
+       </script>  
+       <script src="bootstrap.min.js">
+       </script>  -->
+       </body> 
+       </html>   
